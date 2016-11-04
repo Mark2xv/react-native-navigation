@@ -41,6 +41,7 @@ public class StyleParams {
     public Color contextualMenuBackgroundColor;
 
     public Color topBarColor;
+    public CollapsingTopBarParams collapsingTopBarParams;
     public boolean topBarHidden;
     public boolean topTabsHidden;
     public boolean drawScreenBelowTopBar;
@@ -60,7 +61,6 @@ public class StyleParams {
 
     public boolean drawScreenAboveBottomTabs;
 
-    public Color snackbarTextColor;
     public Color snackbarButtonColor;
 
     public boolean bottomTabsHidden;
