@@ -3,30 +3,32 @@ package com.reactnativenavigation.views.collapsingToolbar;
 import android.view.MotionEvent;
 import android.widget.ScrollView;
 
-public class ScrollListener implements ScrollViewDelegate.OnScrollListener {
+import com.reactnativenavigation.views.collapsingToolbar.behaviours.CollapseBehaviour;
+import com.reactnativenavigation.views.collapsingToolbar.behaviours.CollapseTopBarBehaviour;
+
+
+public class ScrollListener {
     private CollapseCalculator collapseCalculator;
     private OnScrollListener scrollListener;
+    private CollapseBehaviour collapseBehaviour;
 
-    public interface  OnScrollListener {
-        void onScroll(float amount);
-    }
-
-    public ScrollListener(CollapsingView collapsingView, OnScrollListener scrollListener) {
-        this.collapseCalculator = new CollapseCalculator(collapsingView);
+    public ScrollListener(CollapseCalculator collapseCalculator, OnScrollListener scrollListener,
+                          CollapseBehaviour collapseBehaviour) {
+        this.collapseCalculator = collapseCalculator;
         this.scrollListener = scrollListener;
+        this.collapseBehaviour = collapseBehaviour;
+        collapseCalculator.setFlingListener(scrollListener);
     }
 
-    @Override
-    public void onScrollViewAdded(ScrollView scrollView) {
+    void onScrollViewAdded(ScrollView scrollView) {
         collapseCalculator.setScrollView(scrollView);
     }
 
-    @Override
-    public boolean onTouch(MotionEvent event) {
+    boolean onTouch(MotionEvent event) {
         CollapseAmount amount = collapseCalculator.calculate(event);
         if (amount.canCollapse()) {
-            scrollListener.onScroll(amount.get());
-            return true;
+            scrollListener.onScroll(amount);
+            return collapseBehaviour instanceof CollapseTopBarBehaviour;
         }
         return false;
     }

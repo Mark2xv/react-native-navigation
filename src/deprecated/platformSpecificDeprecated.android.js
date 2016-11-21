@@ -44,6 +44,8 @@ function adaptTopTabs(screen, navigatorID) {
     tab.screen = tab.screenId;
     addNavigatorButtons(tab);
     adaptNavigationParams(tab);
+    addNavigationStyleParams(tab);
+    tab = adaptNavigationStyleToScreenStyle(tab);
   });
 }
 
@@ -59,7 +61,7 @@ function navigatorPush(navigator, params) {
   let adapted = adaptNavigationStyleToScreenStyle(params);
   adapted = adaptNavigationParams(adapted);
   adapted.overrideBackPress = params.overrideBackPress;
-  
+
   newPlatformSpecific.push(adapted);
 }
 
@@ -117,9 +119,11 @@ function convertStyleParams(originalStyleObject) {
     statusBarColor: originalStyleObject.statusBarColor,
     topBarColor: originalStyleObject.navBarBackgroundColor,
     topBarTransparent: originalStyleObject.navBarTransparent,
+    topBarTranslucent: originalStyleObject.navBarTranslucent,
     collapsingToolBarImage: originalStyleObject.collapsingToolBarImage,
     collapsingToolBarCollapsedColor: originalStyleObject.collapsingToolBarCollapsedColor,
     titleBarHidden: originalStyleObject.navBarHidden,
+    titleBarHideOnScroll: originalStyleObject.navBarHideOnScroll,
     titleBarTitleColor: originalStyleObject.navBarTextColor,
     titleBarSubtitleColor: originalStyleObject.navBarTextSubtitleColor,
     titleBarButtonColor: originalStyleObject.navBarButtonColor,
@@ -136,6 +140,8 @@ function convertStyleParams(originalStyleObject) {
     selectedTopTabTextColor: originalStyleObject.selectedTopTabTextColor,
     selectedTopTabIndicatorHeight: originalStyleObject.selectedTopTabIndicatorHeight,
     selectedTopTabIndicatorColor: originalStyleObject.selectedTopTabIndicatorColor,
+
+    screenBackgroundColor: originalStyleObject.screenBackgroundColor,
 
     drawScreenAboveBottomTabs: !originalStyleObject.drawUnderTabBar,
 
@@ -351,7 +357,7 @@ function addNavigatorParams(screen, navigator = null, idx = '') {
 
 function addNavigatorButtons(screen, sideMenuParams) {
   const Screen = Navigation.getRegisteredScreen(screen.screen);
-  Object.assign(screen, Screen.navigatorButtons);
+  screen.navigatorButtons = _.cloneDeep(Screen.navigatorButtons);
 
   // Get image uri from image id
   const rightButtons = getRightButtons(screen);
@@ -394,8 +400,8 @@ function addNavigatorButtons(screen, sideMenuParams) {
 }
 
 function getFab(screen) {
-  if (screen.fab) {
-    const fab = screen.fab;
+  if (screen.navigatorButtons && screen.navigatorButtons.fab) {
+    const fab = screen.navigatorButtons.fab;
     const collapsedIconUri = resolveAssetSource(fab.collapsedIcon);
     if (!collapsedIconUri) {
       return;

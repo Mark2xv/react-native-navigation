@@ -62,12 +62,19 @@ public class TitleBar extends Toolbar {
         setTitleTextColor(params);
         setSubtitleTextColor(params);
         colorOverflowButton(params);
+        setTranslucent(params);
     }
 
     private void colorOverflowButton(StyleParams params) {
         Drawable overflowIcon = actionMenuView.getOverflowIcon();
         if (shouldColorOverflowButton(params, overflowIcon)) {
             ViewUtils.tintDrawable(overflowIcon, params.titleBarButtonColor.getColor(), true);
+        }
+    }
+
+    private void setTranslucent(StyleParams params) {
+        if (params.topBarTranslucent) {
+            setBackground(new TranslucentTitleBarBackground());
         }
     }
 
@@ -89,7 +96,7 @@ public class TitleBar extends Toolbar {
 
     private void addButtonsToTitleBar(List<TitleBarButtonParams> rightButtons, String navigatorEventId, Menu menu) {
         for (int i = 0; i < rightButtons.size(); i++) {
-            final TitleBarButton button = new TitleBarButton(menu, this, rightButtons.get(i), navigatorEventId);
+            final TitleBarButton button = ButtonFactory.create(menu, this, rightButtons.get(i), navigatorEventId);
             addButtonInReverseOrder(rightButtons, i, button);
         }
     }
@@ -141,10 +148,22 @@ public class TitleBar extends Toolbar {
     }
 
     public void show() {
+        this.show(null);
+    }
+
+    public void show(final @Nullable Runnable onDisplayed) {
         setAlpha(0);
         animate()
                 .alpha(1)
                 .setDuration(200)
-                .setInterpolator(new AccelerateDecelerateInterpolator());
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (onDisplayed != null) {
+                            onDisplayed.run();
+                        }
+                    }
+                });
     }
 }

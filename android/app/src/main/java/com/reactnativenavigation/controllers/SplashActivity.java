@@ -16,7 +16,7 @@ public abstract class SplashActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setSplashLayout();
-        DeepLinkHandler.saveDeepLinkData(getIntent().getData());
+        IntentDataHandler.saveIntentData(getIntent());
     }
 
     @Override
@@ -24,10 +24,7 @@ public abstract class SplashActivity extends AppCompatActivity {
         super.onResume();
 
         if (NavigationApplication.instance.getReactGateway().hasStartedCreatingContext()) {
-            if (DeepLinkHandler.hasDeepLinkData()) {
-                finish();
-            }
-            return;
+            finish();
         }
 
         if (ReactDevPermission.shouldAskPermission()) {
